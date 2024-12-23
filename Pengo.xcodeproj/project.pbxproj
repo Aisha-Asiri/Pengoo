@@ -6,13 +6,30 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		370B0BF52D194D1900DE9ED3 /* GoogleGenerativeAI in Frameworks */ = {isa = PBXBuildFile; productRef = 370B0BF42D194D1900DE9ED3 /* GoogleGenerativeAI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		1ECF9EAD2D0ED70600FD2DED /* Pengo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pengo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		370B0BF22D194CE800DE9ED3 /* Exceptions for "Pengo" folder in "Pengo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1ECF9EAC2D0ED70600FD2DED /* Pengo */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1ECF9EAF2D0ED70600FD2DED /* Pengo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				370B0BF22D194CE800DE9ED3 /* Exceptions for "Pengo" folder in "Pengo" target */,
+			);
 			path = Pengo;
 			sourceTree = "<group>";
 		};
@@ -23,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				370B0BF52D194D1900DE9ED3 /* GoogleGenerativeAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +83,7 @@
 			);
 			name = Pengo;
 			packageProductDependencies = (
+				370B0BF42D194D1900DE9ED3 /* GoogleGenerativeAI */,
 			);
 			productName = Pengo;
 			productReference = 1ECF9EAD2D0ED70600FD2DED /* Pengo.app */;
@@ -94,6 +113,9 @@
 			);
 			mainGroup = 1ECF9EA42D0ED70600FD2DED;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				370B0BF32D194D1900DE9ED3 /* XCRemoteSwiftPackageReference "generative-ai-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1ECF9EAE2D0ED70600FD2DED /* Products */;
 			projectDirPath = "";
@@ -256,6 +278,9 @@
 				DEVELOPMENT_TEAM = S3K4GUTRK8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Pengo/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -286,6 +311,9 @@
 				DEVELOPMENT_TEAM = S3K4GUTRK8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Pengo/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -326,6 +354,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		370B0BF32D194D1900DE9ED3 /* XCRemoteSwiftPackageReference "generative-ai-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google-gemini/generative-ai-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		370B0BF42D194D1900DE9ED3 /* GoogleGenerativeAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 370B0BF32D194D1900DE9ED3 /* XCRemoteSwiftPackageReference "generative-ai-swift" */;
+			productName = GoogleGenerativeAI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1ECF9EA52D0ED70600FD2DED /* Project object */;
 }
