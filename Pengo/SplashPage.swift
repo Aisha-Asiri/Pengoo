@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct SplashPage: View {
     @State private var isActive = false // State to manage navigation trigger
     
     var body: some View {
@@ -40,5 +40,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    SplashPage()
 }
