@@ -83,13 +83,13 @@ struct ContentView2: View {
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Chat")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(leading: Button(action: {
-                // Add action for back button here (e.g., dismiss the view)
-                print("Back button tapped!")
-            }) {
-                Image(systemName: "chevron.left")
-                    .foregroundColor(.blue)
-            })
+//            .navigationBarItems(leading: Button(action: {
+//                // Add action for back button here (e.g., dismiss the view)
+//                print("Back button tapped!")
+//            }) {
+//                Image(systemName: "chevron.left")
+//                    .foregroundColor(.blue)
+//            })
             .showLoader(showLoader: showLoader)
         }
     }
