@@ -1,3 +1,4 @@
+
 import SwiftUI
 
 struct ProfileView: View {
@@ -5,7 +6,9 @@ struct ProfileView: View {
     @AppStorage("isDarkMode") private var isDarkMode = false // Stores dark mode preference
     @AppStorage("selectedLanguage") private var selectedLanguage = "English" // Stores selected language
     @AppStorage("hasEnteredProfile") private var hasEnteredProfile: Bool = false // Tracks if the user has entered the profile page before
-
+    
+    private let cloudKitHelper = ProfilePage() // CloudKit Helper instance
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -31,9 +34,40 @@ struct ProfileView: View {
             .edgesIgnoringSafeArea(.bottom) // Ensures bottom bar covers the full width
             .navigationBarBackButtonHidden(true) // Hides the back button
             .onAppear {
+                // Fetch preferences from CloudKit when the view appears
+                cloudKitHelper.fetchPreferences { success, darkMode, language, profileEntered in
+                    if success {
+                        self.isDarkMode = darkMode
+                        self.selectedLanguage = language
+                        self.hasEnteredProfile = profileEntered
+                    }
+                }
+            }
+            .onChange(of: isDarkMode) { newValue in
+                // Save preferences to CloudKit when dark mode is changed
+                cloudKitHelper.savePreferences(isDarkMode: newValue, selectedLanguage: selectedLanguage, hasEnteredProfile: hasEnteredProfile) { success in
+                    if success {
+                        print("Preferences saved successfully.")
+                    }
+                }
+            }
+            .onChange(of: selectedLanguage) { newValue in
+                // Save preferences to CloudKit when language is changed
+                cloudKitHelper.savePreferences(isDarkMode: isDarkMode, selectedLanguage: newValue, hasEnteredProfile: hasEnteredProfile) { success in
+                    if success {
+                        print("Preferences saved successfully.")
+                    }
+                }
+            }
+            .onAppear {
                 // Sets the value when the user enters the profile page for the first time
                 if !hasEnteredProfile {
                     hasEnteredProfile = true // Marked as visited
+                    cloudKitHelper.savePreferences(isDarkMode: isDarkMode, selectedLanguage: selectedLanguage, hasEnteredProfile: true) { success in
+                        if success {
+                            print("User profile entry marked.")
+                        }
+                    }
                 }
             }
         }

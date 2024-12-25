@@ -1,3 +1,4 @@
+
 //
 //  SplashPage.swift
 //  Pengo
@@ -17,7 +18,7 @@ struct ContentView: View {
                     .edgesIgnoringSafeArea(.all)
                 
                 VStack {
-                    Image("Pengo1")
+                    Image("Pengo0")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 300, height: 300)

@@ -1,18 +1,9 @@
-//
-//  ContentView.swift
-//  PengoAI
-//
-//  Created by E07 on 17/06/1446 AH.
-//
 
 import SwiftUI
 
 struct ContentView2: View {
-    
-    private let viewModel = ChatBotViewModel()
+    @StateObject private var viewModel = ChatViewModel()
     @State private var textField = ""
-    @State private var showLoader: Bool = false
-    @State private var messages: [(String, Bool)] = [] // (Message, IsUserMessage)
     
     var body: some View {
         NavigationView {
@@ -21,8 +12,8 @@ struct ContentView2: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(spacing: 12) {
-                            ForEach(messages.indices, id: \.self) { index in
-                                let message = messages[index]
+                            ForEach(viewModel.messages.indices, id: \.self) { index in
+                                let message = viewModel.messages[index]
                                 HStack {
                                     if message.1 {
                                         Spacer()
@@ -48,9 +39,9 @@ struct ContentView2: View {
                         .padding(.horizontal)
                         .padding(.top)
                     }
-                    .onChange(of: messages.count) { _ in
+                    .onChange(of: viewModel.messages.count) { _ in
                         withAnimation {
-                            proxy.scrollTo(messages.indices.last, anchor: .bottom)
+                            proxy.scrollTo(viewModel.messages.indices.last, anchor: .bottom)
                         }
                     }
                 }
@@ -60,7 +51,7 @@ struct ContentView2: View {
                 HStack {
                     TextField("Enter your question...", text: $textField, axis: .vertical)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(minHeight: 15, maxHeight: 40) // Adjusted height to support scrolling
+                        .frame(minHeight: 15, maxHeight: 40)
                         .padding(.horizontal, 2)
                         .onSubmit {
                             sendQuestion(textField)
@@ -83,29 +74,30 @@ struct ContentView2: View {
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Chat")
             .navigationBarTitleDisplayMode(.inline)
-//            .navigationBarItems(leading: Button(action: {
-//                // Add action for back button here (e.g., dismiss the view)
-//                print("Back button tapped!")
-//            }) {
-//                Image(systemName: "chevron.left")
-//                    .foregroundColor(.blue)
-//            })
-            .showLoader(showLoader: showLoader)
+            .showLoader(showLoader: viewModel.showLoader)
+            .onAppear {
+                // Fetch messages when the view appears
+                viewModel.fetchMessages()
+            }
         }
     }
     
     func sendQuestion(_ question: String) {
         guard !question.isEmpty else { return }
-        messages.append((question, true)) // Append user message
-        textField = ""
-        showLoader = true
         
-        Task {
-            try await viewModel.generateAnswer(question: question)
-            if let response = viewModel.response {
-                messages.append((response, false)) // Append bot response
+        // Append the user's message
+        viewModel.messages.append((question, true))
+        textField = ""
+        viewModel.showLoader = true
+        
+        // Get the bot's response
+        viewModel.sendQuestion(question: question) { response in
+            // Append bot's response and save to CloudKit
+            DispatchQueue.main.async {
+                viewModel.messages.append((response, false))
+                viewModel.saveMessage(question: question, response: response)
+                viewModel.showLoader = false
             }
-            showLoader = false
         }
     }
 }

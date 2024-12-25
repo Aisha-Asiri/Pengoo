@@ -1,3 +1,4 @@
+
 import SwiftUI
 
 struct BottomBar: View {
@@ -65,7 +66,7 @@ struct BottomBar: View {
                         .scaledToFit()
                         .frame(width: 20, height: 20)
                         .foregroundColor(isDarkMode ? Color.white : Color(hex: "#D3D3D3"))
-                    Text(selectedLanguage == "English" ? "History" : "التاريخ")
+                    Text(selectedLanguage == "English" ? "History" : "الأرشيف")
                         .font(.system(size: 8))
                         .foregroundColor(isDarkMode ? Color.white : Color(hex: "#D3D3D3"))
                 }
@@ -77,7 +78,7 @@ struct BottomBar: View {
                             .scaledToFit()
                             .frame(width: 20, height: 20)
                             .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
-                        Text(selectedLanguage == "English" ? "History" : "التاريخ")
+                        Text(selectedLanguage == "English" ? "History" : "الأرشيف")
                             .font(.system(size: 8))
                             .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
                     }

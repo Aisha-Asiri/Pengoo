@@ -1,3 +1,4 @@
+
 import SwiftUI
 
 // Model: تعريف الاقتباسات

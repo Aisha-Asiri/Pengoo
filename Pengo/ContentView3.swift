@@ -1,8 +1,9 @@
+
 import SwiftUI
 
 struct ContentView3: View {
     @StateObject private var viewModel = MotivationalViewModel()
-    @AppStorage("isDarkMode") private var isDarkMode = false
+    @AppStorage("isDarkMode") private var colorScheme = false
     @AppStorage("selectedLanguage") private var selectedLanguage = "English"
     @AppStorage("userName") private var userName: String = "User" // Retrieve the stored name
     
@@ -17,7 +18,7 @@ struct ContentView3: View {
                     BottomBar(currentPage: "ContentView")
                         .padding(.bottom, 10)
                 }
-                .background(isDarkMode ? Color.black : Color.white)
+                .background(colorScheme ? Color.black : Color.white)
                 .ignoresSafeArea()
             }
             .navigationBarBackButtonHidden(true)
@@ -29,7 +30,7 @@ struct ContentView3: View {
         HStack {
             Text(selectedLanguage == "English" ? "Hello, \(userName)!" : "مرحبًا، \(userName)!")
                 .font(.system(size: geometry.size.width * 0.06, weight: .bold))
-                .foregroundColor(isDarkMode ? .white : .black)
+                .foregroundColor(colorScheme ? .white : .black)
                 .padding(.leading, 20)
             Spacer()
         }
@@ -49,7 +50,7 @@ struct ContentView3: View {
                 Text(selectedLanguage == "English" ? viewModel.currentQuote : viewModel.currentQuoteAr)
                     .multilineTextAlignment(.center)
                     .font(.system(size: geometry.size.width * 0.045, weight: .medium))
-                    .foregroundColor(isDarkMode ? .white : .black)
+                    .foregroundColor(colorScheme ? .white : .black)
                     .padding(.horizontal, 20)
                     .lineLimit(3)
                     .minimumScaleFactor(0.5)
@@ -69,9 +70,17 @@ struct ContentView3: View {
 // MARK: - Preview
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView3()
-            .environment(\.colorScheme, .light)
-        ContentView3()
-            .environment(\.colorScheme, .dark)
+        Group {
+            // Show Light Mode Preview
+            ContentView3()
+                .environment(\.colorScheme, .light)
+                .previewDisplayName("Light Mode") // Optional: gives it a name
+
+            // Show Dark Mode Preview
+            ContentView3()
+                .environment(\.colorScheme, .dark)
+                .previewDisplayName("Dark Mode") // Optional: gives it a name
+        }
+        .previewLayout(.sizeThatFits) // Optional: adjust the layout for previews
     }
 }
