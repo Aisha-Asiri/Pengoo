@@ -1,15 +1,6 @@
-
-//
-//  ChatBotViewModel.swift
-//  PengoAI
-//
-//  Created by E07 on 17/06/1446 AH.
-//
-
 import Foundation
 import GoogleGenerativeAI
 import AVFoundation
-
 @Observable
 class ChatBotViewModel {
     let model: GenerativeModel
@@ -35,7 +26,6 @@ class ChatBotViewModel {
             throw error
         }
     }
-
     // Custom function to generate a customized response automatically
     func customizeAIResponse(question: String) async throws {
         self.response = nil

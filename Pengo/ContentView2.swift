@@ -1,9 +1,10 @@
-
 import SwiftUI
-
 struct ContentView2: View {
-    @StateObject private var viewModel = ChatViewModel()
+    
+    private let viewModel = ChatBotViewModel()
     @State private var textField = ""
+    @State private var showLoader: Bool = false
+    @State private var messages: [(String, Bool)] = [] // (Message, IsUserMessage)
     
     var body: some View {
         NavigationView {
@@ -12,21 +13,21 @@ struct ContentView2: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(spacing: 12) {
-                            ForEach(viewModel.messages.indices, id: \.self) { index in
-                                let message = viewModel.messages[index]
+                            ForEach(messages.indices, id: \.self) { index in
+                                let message = messages[index]
                                 HStack {
                                     if message.1 {
                                         Spacer()
                                         Text(message.0)
                                             .padding()
-                                            .background(Color.greenBlue)
+                                            .background(Color.greenBlue1)
                                             .cornerRadius(15)
                                             .frame(maxWidth: .infinity, alignment: .trailing)
-                                            .foregroundColor(Color(hex: "#B3C8CF"))
+                                            .foregroundColor(Color(hex: "#E0DFDF"))
                                     } else {
                                         Text(message.0)
                                             .padding()
-                                            .background(Color.gray.opacity(0.2))
+                                            .background(Color.gray)
                                             .cornerRadius(15)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(Color(hex: "#E0DFDF"))
@@ -39,26 +40,24 @@ struct ContentView2: View {
                         .padding(.horizontal)
                         .padding(.top)
                     }
-                    .onChange(of: viewModel.messages.count) { _ in
+                    .onChange(of: messages.count) { _ in
                         withAnimation {
-                            proxy.scrollTo(viewModel.messages.indices.last, anchor: .bottom)
+                            proxy.scrollTo(messages.indices.last, anchor: .bottom)
                         }
                     }
                 }
                 .background(Color(.systemGroupedBackground))
-
                 // Input area
                 HStack {
                     TextField("Enter your question...", text: $textField, axis: .vertical)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(minHeight: 15, maxHeight: 40)
+                        .frame(minHeight: 15, maxHeight: 40) // Adjusted height to support scrolling
                         .padding(.horizontal, 2)
                         .onSubmit {
                             sendQuestion(textField)
                         }
                         .accessibilityLabel("Enter your question")
                         .accessibilityHint("Use dictation or typing to ask a question")
-
                     Button(action: {
                         sendQuestion(textField)
                     }) {
@@ -74,34 +73,26 @@ struct ContentView2: View {
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Chat")
             .navigationBarTitleDisplayMode(.inline)
-            .showLoader(showLoader: viewModel.showLoader)
-            .onAppear {
-                // Fetch messages when the view appears
-                viewModel.fetchMessages()
-            }
+          
+            .showLoader(showLoader: showLoader)
         }
     }
     
     func sendQuestion(_ question: String) {
         guard !question.isEmpty else { return }
-        
-        // Append the user's message
-        viewModel.messages.append((question, true))
+        messages.append((question, true)) // Append user message
         textField = ""
-        viewModel.showLoader = true
+        showLoader = true
         
-        // Get the bot's response
-        viewModel.sendQuestion(question: question) { response in
-            // Append bot's response and save to CloudKit
-            DispatchQueue.main.async {
-                viewModel.messages.append((response, false))
-                viewModel.saveMessage(question: question, response: response)
-                viewModel.showLoader = false
+        Task {
+            try await viewModel.generateAnswer(question: question)
+            if let response = viewModel.response {
+                messages.append((response, false)) // Append bot response
             }
+            showLoader = false
         }
     }
 }
-
 struct ProgressViewScreen: ViewModifier {
     let showLoader: Bool
     func body(content: Content) -> some View {
@@ -115,13 +106,11 @@ struct ProgressViewScreen: ViewModifier {
         }
     }
 }
-
 extension View {
     func showLoader(showLoader: Bool) -> some View {
         self.modifier(ProgressViewScreen(showLoader: showLoader))
     }
 }
-
 // Hex Color Extension
 extension Color {
     init(hex: String) {
@@ -135,7 +124,6 @@ extension Color {
         self.init(red: r, green: g, blue: b)
     }
 }
-
 #Preview {
     ContentView2()
 }
