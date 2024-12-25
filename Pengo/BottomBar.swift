@@ -1,8 +1,7 @@
-
 import SwiftUI
 
 struct BottomBar: View {
-    @AppStorage("isDarkMode") private var isDarkMode = false
+    @Environment(\.colorScheme) var colorScheme // Access the current color scheme (light or dark)
     @AppStorage("selectedLanguage") private var selectedLanguage = "English"
     
     var currentPage: String? // The current page name
@@ -19,10 +18,10 @@ struct BottomBar: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                         Text(selectedLanguage == "English" ? "Pengo" : "بنقو")
                             .font(.system(size: 8))
-                            .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                     }
                 }
             } else {
@@ -32,10 +31,10 @@ struct BottomBar: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                         Text(selectedLanguage == "English" ? "Pengo" : "بنقو")
                             .font(.system(size: 8))
-                            .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                     }
                 }
             }
@@ -49,10 +48,10 @@ struct BottomBar: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
-                        .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                     Text(selectedLanguage == "English" ? "Chat" : "دردشة")
                         .font(.system(size: 8))
-                        .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                 }
             }
 
@@ -65,10 +64,10 @@ struct BottomBar: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
-                        .foregroundColor(isDarkMode ? Color.white : Color(hex: "#D3D3D3"))
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#D3D3D3"))
                     Text(selectedLanguage == "English" ? "History" : "الأرشيف")
                         .font(.system(size: 8))
-                        .foregroundColor(isDarkMode ? Color.white : Color(hex: "#D3D3D3"))
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#D3D3D3"))
                 }
             } else {
                 NavigationLink(destination: HistoryView()) {
@@ -77,10 +76,10 @@ struct BottomBar: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                         Text(selectedLanguage == "English" ? "History" : "الأرشيف")
                             .font(.system(size: 8))
-                            .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                     }
                 }
             }
@@ -94,10 +93,10 @@ struct BottomBar: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
-                        .foregroundColor(isDarkMode ? Color.white : Color(hex: "#D3D3D3"))
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#D3D3D3"))
                     Text(selectedLanguage == "English" ? "Profile" : "الملف الشخصي")
                         .font(.system(size: 8))
-                        .foregroundColor(isDarkMode ? Color.white : Color(hex: "#D3D3D3"))
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#D3D3D3"))
                 }
             } else {
                 NavigationLink(destination: ProfileView()) {
@@ -106,10 +105,10 @@ struct BottomBar: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                         Text(selectedLanguage == "English" ? "Profile" : "الملف الشخصي")
                             .font(.system(size: 8))
-                            .foregroundColor(isDarkMode ? Color.white : Color(hex: "#979797"))
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color(hex: "#979797"))
                     }
                 }
             }
@@ -117,13 +116,13 @@ struct BottomBar: View {
             Spacer()
         }
         .frame(height: 60)
-        .background(isDarkMode ? Color.black : Color.white)
+        .background(colorScheme == .dark ? Color.black : Color.white) // Background changes based on the color scheme
         .overlay(
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(isDarkMode ? Color.white.opacity(0.2) : Color.black.opacity(0.2)),
+                .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.2) : Color.black.opacity(0.2)), // Divider color changes based on color scheme
             alignment: .top
         )
-        .shadow(color: isDarkMode ? Color.white.opacity(0.1) : Color.black.opacity(0.1), radius: 3, x: 0, y: -3)
+        .shadow(color: colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.1), radius: 3, x: 0, y: -3) // Shadow color changes based on color scheme
     }
 }

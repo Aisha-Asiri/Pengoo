@@ -1,11 +1,11 @@
-
 import SwiftUI
 
 struct ContentView3: View {
     @StateObject private var viewModel = MotivationalViewModel()
-    @AppStorage("isDarkMode") private var colorScheme = false
     @AppStorage("selectedLanguage") private var selectedLanguage = "English"
     @AppStorage("userName") private var userName: String = "User" // Retrieve the stored name
+    
+    @Environment(\.colorScheme) var colorScheme // Access the current color scheme (light or dark)
     
     var body: some View {
         NavigationStack {
@@ -13,12 +13,12 @@ struct ContentView3: View {
                 VStack {
                     Spacer()
                     headingSection(geometry: geometry)
-                    motivationalQuoteBox(geometry: geometry)
+                    motivationalQuoteBox(geometry: geometry) // Call the updated function here
                     Spacer()
                     BottomBar(currentPage: "ContentView")
                         .padding(.bottom, 10)
                 }
-                .background(colorScheme ? Color.black : Color.white)
+                .background(Color("background")) // Use the same background color as other pages
                 .ignoresSafeArea()
             }
             .navigationBarBackButtonHidden(true)
@@ -30,7 +30,7 @@ struct ContentView3: View {
         HStack {
             Text(selectedLanguage == "English" ? "Hello, \(userName)!" : "مرحبًا، \(userName)!")
                 .font(.system(size: geometry.size.width * 0.06, weight: .bold))
-                .foregroundColor(colorScheme ? .white : .black)
+                .foregroundColor(colorScheme == .dark ? .white : .black) // Change text color based on the current mode (Dark/Light)
                 .padding(.leading, 20)
             Spacer()
         }
@@ -41,7 +41,7 @@ struct ContentView3: View {
     private func motivationalQuoteBox(geometry: GeometryProxy) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 30)
-                .fill(Color(red: 179/255, green: 200/255, blue: 207/255))
+                .fill(Color("green-blue")) // تغيير اللون إلى الأخضر الأزرق
                 .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.3)
                 .shadow(radius: 9)
             
@@ -50,7 +50,7 @@ struct ContentView3: View {
                 Text(selectedLanguage == "English" ? viewModel.currentQuote : viewModel.currentQuoteAr)
                     .multilineTextAlignment(.center)
                     .font(.system(size: geometry.size.width * 0.045, weight: .medium))
-                    .foregroundColor(colorScheme ? .white : .black)
+                    .foregroundColor(colorScheme == .dark ? .white : .black) // Change text color based on the current mode (Dark/Light)
                     .padding(.horizontal, 20)
                     .lineLimit(3)
                     .minimumScaleFactor(0.5)

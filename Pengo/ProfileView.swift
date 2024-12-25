@@ -1,13 +1,13 @@
-
 import SwiftUI
 
 struct ProfileView: View {
     // AppStorage properties for user preferences
-    @AppStorage("isDarkMode") private var isDarkMode = false // Stores dark mode preference
     @AppStorage("selectedLanguage") private var selectedLanguage = "English" // Stores selected language
     @AppStorage("hasEnteredProfile") private var hasEnteredProfile: Bool = false // Tracks if the user has entered the profile page before
     
     private let cloudKitHelper = ProfilePage() // CloudKit Helper instance
+    
+    @Environment(\.colorScheme) var colorScheme // Access the current color scheme (light or dark)
     
     var body: some View {
         NavigationStack {
@@ -30,32 +30,15 @@ struct ProfileView: View {
                 BottomBar(currentPage: "ProfileView")
                     .padding(.bottom, 10) // Adds padding to avoid overlapping with screen edges
             }
-            .background(isDarkMode ? Color.black : Color(UIColor.systemGray6)) // Adjusts background based on dark mode
+            .background(Color("background")) // Use the same background color as other pages
             .edgesIgnoringSafeArea(.bottom) // Ensures bottom bar covers the full width
             .navigationBarBackButtonHidden(true) // Hides the back button
             .onAppear {
                 // Fetch preferences from CloudKit when the view appears
                 cloudKitHelper.fetchPreferences { success, darkMode, language, profileEntered in
                     if success {
-                        self.isDarkMode = darkMode
                         self.selectedLanguage = language
                         self.hasEnteredProfile = profileEntered
-                    }
-                }
-            }
-            .onChange(of: isDarkMode) { newValue in
-                // Save preferences to CloudKit when dark mode is changed
-                cloudKitHelper.savePreferences(isDarkMode: newValue, selectedLanguage: selectedLanguage, hasEnteredProfile: hasEnteredProfile) { success in
-                    if success {
-                        print("Preferences saved successfully.")
-                    }
-                }
-            }
-            .onChange(of: selectedLanguage) { newValue in
-                // Save preferences to CloudKit when language is changed
-                cloudKitHelper.savePreferences(isDarkMode: isDarkMode, selectedLanguage: newValue, hasEnteredProfile: hasEnteredProfile) { success in
-                    if success {
-                        print("Preferences saved successfully.")
                     }
                 }
             }
@@ -63,7 +46,7 @@ struct ProfileView: View {
                 // Sets the value when the user enters the profile page for the first time
                 if !hasEnteredProfile {
                     hasEnteredProfile = true // Marked as visited
-                    cloudKitHelper.savePreferences(isDarkMode: isDarkMode, selectedLanguage: selectedLanguage, hasEnteredProfile: true) { success in
+                    cloudKitHelper.savePreferences(isDarkMode: (colorScheme == .dark), selectedLanguage: selectedLanguage, hasEnteredProfile: true) { success in
                         if success {
                             print("User profile entry marked.")
                         }
@@ -77,7 +60,7 @@ struct ProfileView: View {
     private var header: some View {
         Text(selectedLanguage == "English" ? "Profile" : "الملف الشخصي") // Dynamic text based on language
             .font(.system(size: 24, weight: .bold)) // Header font style
-            .foregroundColor(isDarkMode ? .white : .black) // Adjusts color based on dark mode
+            .foregroundColor(colorScheme == .dark ? .white : .black) // Adjusts color to always be white in dark mode
             .padding(.top, 30) // Adds space at the top
     }
     
@@ -86,7 +69,7 @@ struct ProfileView: View {
         Image(systemName: hasEnteredProfile ? "person.crop.circle.fill" : "person.crop.circle") // Filled icon if the user has visited
             .resizable()
             .frame(width: 120, height: 120) // Profile image size
-            .foregroundColor(isDarkMode ? .gray.opacity(0.6) : Color.gray.opacity(0.3)) // Adjusts color based on mode
+            .foregroundColor(colorScheme == .dark ? .gray.opacity(0.6) : Color.gray.opacity(0.3)) // Adjusts color based on mode
             .padding(.top, 20) // Adds top padding
     }
     
@@ -95,14 +78,14 @@ struct ProfileView: View {
         HStack {
             Text(selectedLanguage == "English" ? "Dark Mode" : "الوضع الليلي") // Dynamic label
                 .font(.system(size: 18, weight: .medium))
-                .foregroundColor(isDarkMode ? .white : .black) // Adjusts color based on mode
+                .foregroundColor(colorScheme == .dark ? .white : .black) // Adjusts color based on mode
             Spacer() // Adds spacing between label and toggle
-            Toggle("", isOn: $isDarkMode) // Toggle for dark mode
+            Toggle("", isOn: .constant(colorScheme == .dark)) // Disable toggle as we are using colorScheme directly
                 .labelsHidden() // Hides toggle label
         }
         .padding()
         .frame(height: 50)
-        .background(isDarkMode ? Color.black.opacity(0.3) : Color.gray.opacity(0.2)) // Background styling
+        .background(colorScheme == .dark ? Color.black.opacity(0.3) : Color.gray.opacity(0.2)) // Background styling
         .cornerRadius(12) // Rounded corners
         .padding(.horizontal, 20) // Horizontal padding
         .padding(.top, 30) // Top padding
