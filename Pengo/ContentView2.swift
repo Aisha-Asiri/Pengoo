@@ -1,10 +1,11 @@
 import SwiftUI
+
 struct ContentView2: View {
     
     private let viewModel = ChatBotViewModel()
     @State private var textField = ""
     @State private var showLoader: Bool = false
-    @State private var messages: [(String, Bool)] = [] // (Message, IsUserMessage)
+    @State private var messages: [Message] = [] // استخدام Message بدلاً من (String, Bool)
     
     var body: some View {
         NavigationView {
@@ -13,19 +14,18 @@ struct ContentView2: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(spacing: 12) {
-                            ForEach(messages.indices, id: \.self) { index in
-                                let message = messages[index]
+                            ForEach(messages) { message in
                                 HStack {
-                                    if message.1 {
+                                    if message.isUserMessage {
                                         Spacer()
-                                        Text(message.0)
+                                        Text(message.text)
                                             .padding()
                                             .background(Color.greenBlue1)
                                             .cornerRadius(15)
                                             .frame(maxWidth: .infinity, alignment: .trailing)
                                             .foregroundColor(Color(hex: "#E0DFDF"))
                                     } else {
-                                        Text(message.0)
+                                        Text(message.text)
                                             .padding()
                                             .background(Color.gray)
                                             .cornerRadius(15)
@@ -34,7 +34,6 @@ struct ContentView2: View {
                                         Spacer()
                                     }
                                 }
-                                .id(index)
                             }
                         }
                         .padding(.horizontal)
@@ -42,22 +41,23 @@ struct ContentView2: View {
                     }
                     .onChange(of: messages.count) { _ in
                         withAnimation {
-                            proxy.scrollTo(messages.indices.last, anchor: .bottom)
+                            proxy.scrollTo(messages.last?.id, anchor: .bottom)
                         }
                     }
                 }
                 .background(Color(.systemGroupedBackground))
-                // Input area
+                
+                // Input bar
                 HStack {
                     TextField("Enter your question...", text: $textField, axis: .vertical)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(minHeight: 15, maxHeight: 40) // Adjusted height to support scrolling
-                        .padding(.horizontal, 2)
+                        .padding(12)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(20)
+                        .foregroundColor(.primary)
                         .onSubmit {
                             sendQuestion(textField)
                         }
-                        .accessibilityLabel("Enter your question")
-                        .accessibilityHint("Use dictation or typing to ask a question")
+                    
                     Button(action: {
                         sendQuestion(textField)
                     }) {
@@ -65,34 +65,46 @@ struct ContentView2: View {
                             .font(.system(size: 24))
                             .foregroundColor(.blue)
                     }
-                    .padding(.trailing, 2)
                 }
                 .padding(.horizontal)
-                .padding(.vertical, 5)
+                .padding(.vertical, 8)
+                .background(Color(.systemBackground)) // خلفية الشريط بالكامل
+                
             }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Chat")
             .navigationBarTitleDisplayMode(.inline)
-          
             .showLoader(showLoader: showLoader)
         }
     }
     
     func sendQuestion(_ question: String) {
         guard !question.isEmpty else { return }
-        messages.append((question, true)) // Append user message
+        messages.append(Message(text: question, isUserMessage: true)) // Append user message
         textField = ""
         showLoader = true
+        
+        // حفظ الرسائل في UserDefaults
+        saveMessagesToUserDefaults()
         
         Task {
             try await viewModel.generateAnswer(question: question)
             if let response = viewModel.response {
-                messages.append((response, false)) // Append bot response
+                messages.append(Message(text: response, isUserMessage: false)) // Append bot response
             }
             showLoader = false
+            saveMessagesToUserDefaults() // تحديث الرسائل المحفوظة بعد الرد
+        }
+    }
+
+    // دالة لحفظ الرسائل في UserDefaults
+    func saveMessagesToUserDefaults() {
+        if let encoded = try? JSONEncoder().encode(messages) {
+            UserDefaults.standard.set(encoded, forKey: "chatHistory")
         }
     }
 }
+
 struct ProgressViewScreen: ViewModifier {
     let showLoader: Bool
     func body(content: Content) -> some View {
@@ -106,12 +118,13 @@ struct ProgressViewScreen: ViewModifier {
         }
     }
 }
+
 extension View {
     func showLoader(showLoader: Bool) -> some View {
         self.modifier(ProgressViewScreen(showLoader: showLoader))
     }
 }
-// Hex Color Extension
+
 extension Color {
     init(hex: String) {
         let scanner = Scanner(string: hex)
@@ -124,6 +137,7 @@ extension Color {
         self.init(red: r, green: g, blue: b)
     }
 }
+
 #Preview {
     ContentView2()
 }

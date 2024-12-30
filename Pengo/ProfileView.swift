@@ -4,6 +4,7 @@ struct ProfileView: View {
     // AppStorage properties for user preferences
     @AppStorage("selectedLanguage") private var selectedLanguage = "English" // Stores selected language
     @AppStorage("hasEnteredProfile") private var hasEnteredProfile: Bool = false // Tracks if the user has entered the profile page before
+    @AppStorage("isDarkMode") private var isDarkMode: Bool = false // Stores the user's Dark Mode preference
     
     private let cloudKitHelper = ProfilePage() // CloudKit Helper instance
     
@@ -39,6 +40,7 @@ struct ProfileView: View {
                     if success {
                         self.selectedLanguage = language
                         self.hasEnteredProfile = profileEntered
+                        self.isDarkMode = darkMode // Set Dark Mode preference from CloudKit
                     }
                 }
             }
@@ -46,13 +48,15 @@ struct ProfileView: View {
                 // Sets the value when the user enters the profile page for the first time
                 if !hasEnteredProfile {
                     hasEnteredProfile = true // Marked as visited
-                    cloudKitHelper.savePreferences(isDarkMode: (colorScheme == .dark), selectedLanguage: selectedLanguage, hasEnteredProfile: true) { success in
+                    cloudKitHelper.savePreferences(isDarkMode: isDarkMode, selectedLanguage: selectedLanguage, hasEnteredProfile: true) { success in
                         if success {
                             print("User profile entry marked.")
                         }
                     }
                 }
             }
+            // Apply the color scheme dynamically based on user preference
+            .preferredColorScheme(isDarkMode ? .dark : .light) // Apply the color scheme based on the user's preference
         }
     }
     
@@ -80,7 +84,7 @@ struct ProfileView: View {
                 .font(.system(size: 18, weight: .medium))
                 .foregroundColor(colorScheme == .dark ? .white : .black) // Adjusts color based on mode
             Spacer() // Adds spacing between label and toggle
-            Toggle("", isOn: .constant(colorScheme == .dark)) // Disable toggle as we are using colorScheme directly
+            Toggle("", isOn: $isDarkMode) // Use the bound isDarkMode property to toggle dark mode
                 .labelsHidden() // Hides toggle label
         }
         .padding()

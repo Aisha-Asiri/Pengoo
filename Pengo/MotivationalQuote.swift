@@ -1,18 +1,16 @@
 
 import SwiftUI
 
-// Model: تعريف الاقتباسات
 struct MotivationalQuote {
     let text: String
     let textAr: String
 }
 
-// ViewModel: يحتوي على منطق عرض الاقتباسات
 class MotivationalViewModel: ObservableObject {
     @Published var currentQuote: String = ""
     @Published var currentQuoteAr: String = ""
     
-    // قائمة الاقتباسات
+
     private let motivationalQuotes: [MotivationalQuote] = [
         MotivationalQuote(text: "Challenge is an opportunity to grow.", textAr: "التحدي فرصة للنمو."),
         MotivationalQuote(text: "Perseverance brings you closer to your goal.", textAr: "المثابرة تقربك من هدفك."),
@@ -26,12 +24,11 @@ class MotivationalViewModel: ObservableObject {
         MotivationalQuote(text: "Success is for those who don't give up.", textAr: "النجاح لمن لا يستسلم.")
     ]
     
-    // تهيئة ViewModel
+  
     init() {
         updateQuoteOfTheDay()
     }
     
-    // تحديث اقتباس اليوم بناءً على تاريخ اليوم
     func updateQuoteOfTheDay() {
         let calendar = Calendar.current
         let dayOfYear = calendar.ordinality(of: .day, in: .year, for: Date()) ?? 0

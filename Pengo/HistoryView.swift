@@ -4,7 +4,7 @@ struct HistoryView: View {
     @State private var searchText: String = "" // State for search bar input
     @Environment(\.colorScheme) var colorScheme // Access the current color scheme (light or dark)
     @AppStorage("selectedLanguage") private var selectedLanguage = "English" // Selected language
-    @State private var historyItems: [String] = [] // Holds the history items fetched from CloudKit
+    @State private var historyItems: [String] = [] // Holds the history items fetched from CloudKit (now we will use UserDefaults)
     private var cloudKitHelper = HistoryPage() // CloudKit helper instance
 
     private var header: some View {
@@ -22,12 +22,10 @@ struct HistoryView: View {
 
                 // Search Bar
                 HStack {
-                    // Search icon
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(colorScheme == .dark ? .white : .gray)
                         .padding(.leading, 15)
 
-                    // TextField for user input
                     ZStack(alignment: .leading) {
                         if searchText.isEmpty {
                             Text(selectedLanguage == "English" ? "Search" : "بحث")
@@ -51,14 +49,9 @@ struct HistoryView: View {
                 .padding(.horizontal)
                 .padding(.top, 30)
 
-                // Spacer between search bar and content
-                Spacer()
-
                 // Content Section
                 VStack {
-                    // Show history or no history message based on fetched data
                     if historyItems.isEmpty {
-                        // Placeholder image with reduced opacity
                         Image("Pengo4")
                             .resizable()
                             .scaledToFit()
@@ -66,13 +59,11 @@ struct HistoryView: View {
                             .opacity(0.6)
                             .foregroundColor(.gray)
 
-                        // No History text
                         Text(selectedLanguage == "English" ? "No History" : "لا يوجد أرشيف")
                             .font(.headline)
                             .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.7) : Color.black.opacity(0.6))
                             .padding(.top, -30)
                     } else {
-                        // Display history items
                         List(historyItems, id: \.self) { item in
                             Text(item)
                                 .foregroundColor(colorScheme == .dark ? .white : .black)
@@ -82,23 +73,23 @@ struct HistoryView: View {
 
                 Spacer()
 
-                // Reusable toolbar at the bottom
                 BottomBar(currentPage: "HistoryView")
                     .padding(.bottom, 10)
             }
-            .background(Color("background")) // Use the same background color as SplashPage
+            .background(Color("background"))
             .ignoresSafeArea()
             .navigationBarBackButtonHidden(true)
             .onAppear {
-                // Fetch history when the view appears
-                cloudKitHelper.fetchHistory { success, items in
-                    if success {
-                        self.historyItems = items
-                    } else {
-                        print("Failed to fetch history.")
-                    }
-                }
+                loadHistoryFromUserDefaults() // تحميل المحادثات المحفوظة
             }
+        }
+    }
+
+    // دالة لتحميل المحادثات من UserDefaults
+    func loadHistoryFromUserDefaults() {
+        if let savedData = UserDefaults.standard.data(forKey: "chatHistory"),
+           let decodedMessages = try? JSONDecoder().decode([Message].self, from: savedData) {
+            self.historyItems = decodedMessages.map { $0.text } // فقط نعرض النصوص (messages)
         }
     }
 }

@@ -3,9 +3,10 @@ import SwiftUI
 struct ContentView3: View {
     @StateObject private var viewModel = MotivationalViewModel()
     @AppStorage("selectedLanguage") private var selectedLanguage = "English"
-    @AppStorage("userName") private var userName: String = "User" // Retrieve the stored name
+    @AppStorage("userName") private var userName: String = "User"
+    @State private var navigateToContentView2 = false
     
-    @Environment(\.colorScheme) var colorScheme // Access the current color scheme (light or dark)
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationStack {
@@ -13,13 +14,24 @@ struct ContentView3: View {
                 VStack {
                     Spacer()
                     headingSection(geometry: geometry)
-                    motivationalQuoteBox(geometry: geometry) // Call the updated function here
+                    motivationalQuoteBox(geometry: geometry)
                     Spacer()
                     BottomBar(currentPage: "ContentView")
                         .padding(.bottom, 10)
                 }
-                .background(Color("background")) // Use the same background color as other pages
+                .background(Color("background"))
                 .ignoresSafeArea()
+                .gesture(
+                    DragGesture()
+                        .onEnded { value in
+                            if value.translation.width > 100 {
+                                navigateToContentView2 = true
+                            }
+                        }
+                )
+            }
+            .navigationDestination(isPresented: $navigateToContentView2) {
+                ContentView2()
             }
             .navigationBarBackButtonHidden(true)
         }
@@ -30,7 +42,7 @@ struct ContentView3: View {
         HStack {
             Text(selectedLanguage == "English" ? "Hello, \(userName)!" : "مرحبًا، \(userName)!")
                 .font(.system(size: geometry.size.width * 0.06, weight: .bold))
-                .foregroundColor(colorScheme == .dark ? .white : .black) // Change text color based on the current mode (Dark/Light)
+                .foregroundColor(colorScheme == .dark ? .white : .black)
                 .padding(.leading, 20)
             Spacer()
         }
@@ -41,7 +53,7 @@ struct ContentView3: View {
     private func motivationalQuoteBox(geometry: GeometryProxy) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 30)
-                .fill(Color("green-blue")) // تغيير اللون إلى الأخضر الأزرق
+                .fill(Color("green-blue"))
                 .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.3)
                 .shadow(radius: 9)
             
@@ -50,7 +62,7 @@ struct ContentView3: View {
                 Text(selectedLanguage == "English" ? viewModel.currentQuote : viewModel.currentQuoteAr)
                     .multilineTextAlignment(.center)
                     .font(.system(size: geometry.size.width * 0.045, weight: .medium))
-                    .foregroundColor(colorScheme == .dark ? .white : .black) // Change text color based on the current mode (Dark/Light)
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
                     .padding(.horizontal, 20)
                     .lineLimit(3)
                     .minimumScaleFactor(0.5)
@@ -68,19 +80,17 @@ struct ContentView3: View {
 }
 
 // MARK: - Preview
-struct ContentView_Previews: PreviewProvider {
+struct ContentView3_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            // Show Light Mode Preview
             ContentView3()
                 .environment(\.colorScheme, .light)
-                .previewDisplayName("Light Mode") // Optional: gives it a name
-
-            // Show Dark Mode Preview
+                .previewDisplayName("Light Mode")
+            
             ContentView3()
                 .environment(\.colorScheme, .dark)
-                .previewDisplayName("Dark Mode") // Optional: gives it a name
+                .previewDisplayName("Dark Mode")
         }
-        .previewLayout(.sizeThatFits) // Optional: adjust the layout for previews
+        .previewLayout(.sizeThatFits)
     }
 }
